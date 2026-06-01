@@ -172,6 +172,7 @@ async function loadTelemetry(){
   setText("energy", `${summary.measured_energy_wh.toFixed(3)} Wh`);
   setText("cycles", summary.equivalent_cycles.toFixed(4));
   setText("health", summary.status === "unknown" ? "Partial" : `${summary.health_percent}%`);
+  setText("sample-count", summary.sample_count);
   drawTelemetry(readings);
 }
 function setText(id,value){ const el = document.getElementById(id); if(el) el.textContent = value; }
@@ -199,6 +200,33 @@ function series(values,color,pad,pw,ph,cx){
 if(page === "telemetry" || page === "analytics"){
   loadTelemetry().catch(e => setText("status-line", e.message));
   setInterval(() => loadTelemetry().catch(()=>{}), 2500);
+}
+
+if(page === "telemetry"){
+  const metricDetails = {
+    voltage:["Voltage","Voltage shows the electrical potential at the battery path. It helps reveal whether the pack is charging normally, sagging under load, or approaching a low-voltage condition.",["voltage_v","INA219","battery path","live value"]],
+    current:["Current","Current tells me how much charge is moving through the sensor. Over time, this is the value that becomes the mAh capacity estimate.",["current_a","charge/discharge","capacity input","shunt"]],
+    power:["Power","Power is voltage multiplied by current. It is useful for quickly seeing how hard the battery is being charged or discharged.",["power_w","V x I","instant load","derived"]],
+    temperature:["Temperature","Temperature is a safety signal. A battery can look electrically normal while still getting too hot, so this value belongs next to the electrical readings.",["temperature_c","safety","thermal","warning"]],
+  };
+  window.showMetric = id => {
+    const [title, desc, tags] = metricDetails[id];
+    setText("metric-title", title);
+    setText("metric-desc", desc);
+    document.getElementById("metric-tags").innerHTML = tags.map((t,i)=>tag(t,["c","g","p","o"][i])).join("");
+  };
+  const telemetrySteps = {
+    collector:["Collector","The background task in server.py asks the active sensor for a reading every few seconds. In demo mode, that sensor is the simulator."],
+    api:["API","The page calls /api/readings and /api/summary. Those routes return JSON from the same local process that is collecting the data."],
+    render:["Render","app.js places the newest values into the cards, draws the chart on canvas, and updates the session summary."],
+    refresh:["Refresh","The browser repeats the fetch cycle every few seconds, so the page feels live without needing a cloud service or separate frontend framework."],
+  };
+  window.selectTelemetryStep = (el,id) => {
+    document.querySelectorAll(".byte").forEach(b=>b.classList.remove("active"));
+    el.classList.add("active");
+    const [title, desc] = telemetrySteps[id];
+    document.getElementById("telemetry-step").innerHTML = `<h4>${title}</h4><p>${desc}</p>`;
+  };
 }
 
 if(page === "analytics"){

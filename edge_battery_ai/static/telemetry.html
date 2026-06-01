@@ -1,22 +1,113 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Telemetry Pipeline - Battery AI</title><link rel="stylesheet" href="/static/styles.css"></head>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Metrics - Battery AI</title>
+<link rel="stylesheet" href="/static/styles.css">
+</head>
 <body data-page="telemetry">
 <nav><a class="nav-brand" href="index.html"><span class="nav-dot"></span>Battery AI</a><ul class="nav-links"><li><a href="index.html">Overview</a></li><li><a href="hardware.html">Hardware</a></li><li><a href="telemetry.html" class="active">Telemetry</a></li><li><a href="analytics.html">Analytics</a></li><li><a href="model.html">AI Model</a></li><li><a href="concepts.html">Concepts</a></li></ul></nav>
+
 <main>
-  <div class="page-hero"><div class="badge">Telemetry Layer</div><h1>Live Telemetry Pipeline</h1><p>The collector samples battery signals, writes them to SQLite, and exposes live readings through FastAPI. This page connects to the running service and plots the current session.</p></div>
-  <div class="section"><h2 style="--accent:#00d4ff">Live Metrics</h2><div class="metric-grid">
-    <div class="metric" style="--cc:var(--cyan)"><div class="metric-lbl">Voltage</div><div class="metric-val" id="voltage">--</div><div class="metric-sub">Bus voltage from the sensor.</div></div>
-    <div class="metric" style="--cc:var(--green)"><div class="metric-lbl">Current</div><div class="metric-val" id="current">--</div><div class="metric-sub">Charge or discharge current.</div></div>
-    <div class="metric" style="--cc:var(--yellow)"><div class="metric-lbl">Power</div><div class="metric-val" id="power">--</div><div class="metric-sub">Voltage multiplied by current.</div></div>
-    <div class="metric" style="--cc:var(--purple)"><div class="metric-lbl">Temperature</div><div class="metric-val" id="temperature">--</div><div class="metric-sub">Thermal safety context.</div></div>
-  </div><div class="chart-card"><canvas id="telemetry-chart"></canvas></div></div>
-  <div class="section"><h2 style="--accent:#69f0ae">API Endpoints</h2><div class="wire-section"><div class="wire-header"><span class="dot" style="background:var(--cyan)"></span>FastAPI telemetry routes</div><table><tr><th>Route</th><th>Purpose</th><th>Used By</th></tr><tr><td>/api/status</td><td>Session, sensor, model config</td><td>Navbar/status cards</td></tr><tr><td>/api/readings</td><td>Recent voltage/current/temp samples</td><td>Live chart</td></tr><tr><td>/api/summary</td><td>Integrated battery analytics</td><td>Analytics page</td></tr><tr><td>/api/report</td><td>Local LLM diagnosis</td><td>Model page</td></tr></table></div></div>
-  <div class="section"><h2 style="--accent:#ff7043">Stored Reading Format</h2><pre><code>{
+  <div class="page-hero">
+    <div class="badge">Live Dashboard</div>
+    <h1>Battery Metrics Console</h1>
+    <p>This page is the live view of the project. It keeps the same guide-style layout as the rest of the site, but the values below are pulled from the running FastAPI service instead of being static documentation.</p>
+  </div>
+
+  <div class="section">
+    <h2 style="--accent:#00d4ff">Current Reading</h2>
+    <div class="comp-grid">
+      <div class="comp live-metric" style="--cc:var(--cyan)" onclick="showMetric('voltage')">
+        <div class="comp-name">Voltage</div>
+        <div class="metric-val" id="voltage">--</div>
+        <div class="comp-desc">Bus voltage measured at the battery path.</div>
+        <div class="comp-specs"><span class="spec-tag">voltage_v</span><span class="spec-tag">sensor reading</span></div>
+      </div>
+      <div class="comp live-metric" style="--cc:var(--green)" onclick="showMetric('current')">
+        <div class="comp-name">Current</div>
+        <div class="metric-val" id="current">--</div>
+        <div class="comp-desc">Charge or discharge current through the sensor shunt.</div>
+        <div class="comp-specs"><span class="spec-tag">current_a</span><span class="spec-tag">I2C sensor</span></div>
+      </div>
+      <div class="comp live-metric" style="--cc:var(--yellow)" onclick="showMetric('power')">
+        <div class="comp-name">Power</div>
+        <div class="metric-val" id="power">--</div>
+        <div class="comp-desc">Instantaneous power calculated from voltage and current.</div>
+        <div class="comp-specs"><span class="spec-tag">power_w</span><span class="spec-tag">V x I</span></div>
+      </div>
+      <div class="comp live-metric" style="--cc:var(--purple)" onclick="showMetric('temperature')">
+        <div class="comp-name">Temperature</div>
+        <div class="metric-val" id="temperature">--</div>
+        <div class="comp-desc">Thermal context for detecting unsafe battery behavior.</div>
+        <div class="comp-specs"><span class="spec-tag">temperature_c</span><span class="spec-tag">safety</span></div>
+      </div>
+    </div>
+    <div class="detail on" id="metric-detail">
+      <div class="detail-head"><h3 id="metric-title">Click a metric card</h3></div>
+      <p id="metric-desc">Each live card maps directly to a field in the telemetry reading saved by the collector.</p>
+      <div class="tags" id="metric-tags"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 style="--accent:#69f0ae">Session Summary</h2>
+    <div class="stats" style="padding:0;margin:0 0 1.5rem;max-width:none;justify-content:flex-start">
+      <div><div class="stat-val" id="sample-count">--</div><div class="stat-lbl">Samples</div></div>
+      <div><div class="stat-val" id="capacity">--</div><div class="stat-lbl">Measured Capacity</div></div>
+      <div><div class="stat-val" id="energy">--</div><div class="stat-lbl">Energy</div></div>
+      <div><div class="stat-val" id="cycles">--</div><div class="stat-lbl">Equivalent Cycles</div></div>
+      <div><div class="stat-val" id="health">--</div><div class="stat-lbl">Health Status</div></div>
+    </div>
+    <div class="chart-card">
+      <div class="wire-header" style="margin:-1.5rem -1.5rem 1rem"><span class="dot" style="background:var(--cyan)"></span>Live telemetry chart</div>
+      <canvas id="telemetry-chart"></canvas>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 style="--accent:#b388ff">How This Page Gets Data</h2>
+    <div class="frame-vis">
+      <div class="frame-row">
+        <div class="byte" style="--bc:#69f0ae;--bs:rgba(105,240,174,.3)" onclick="selectTelemetryStep(this,'collector')"><div class="byte-hex">01</div><div class="byte-label">COLLECT</div></div>
+        <div class="byte" style="--bc:#00d4ff;--bs:rgba(0,212,255,.3)" onclick="selectTelemetryStep(this,'api')"><div class="byte-hex">02</div><div class="byte-label">API</div></div>
+        <div class="byte" style="--bc:#ff7043;--bs:rgba(255,112,67,.3)" onclick="selectTelemetryStep(this,'render')"><div class="byte-hex">03</div><div class="byte-label">RENDER</div></div>
+        <div class="byte" style="--bc:#ffd740;--bs:rgba(255,215,64,.3)" onclick="selectTelemetryStep(this,'refresh')"><div class="byte-hex">04</div><div class="byte-label">REFRESH</div></div>
+      </div>
+      <div class="byte-detail" id="telemetry-step">
+        <h4>Click a step</h4>
+        <p>The dashboard reads from the local API and refreshes the cards and chart while the collector keeps writing samples in the background.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 style="--accent:#ffd740">API Reference</h2>
+    <div class="wire-section">
+      <div class="wire-header"><span class="dot" style="background:var(--yellow)"></span>Routes used by this page</div>
+      <table>
+        <tr><th>Route</th><th>What it returns</th><th>Where it appears</th></tr>
+        <tr><td>/api/status</td><td>Session id, selected sensor, selected model, rated capacity</td><td>Status footer and project context</td></tr>
+        <tr><td>/api/readings</td><td>The most recent telemetry samples from SQLite</td><td>Metric cards and live chart</td></tr>
+        <tr><td>/api/summary</td><td>Capacity, energy, cycle throughput, health state, issues</td><td>Session summary row</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 style="--accent:#ff7043">Stored Reading Shape</h2>
+    <pre><code>{
   "timestamp": "2026-06-01T06:39:50Z",
   "voltage_v": 4.183,
   "current_a": 0.843,
   "power_w": 3.525,
   "temperature_c": 37.4,
   "source": "simulated"
-}</code></pre></div>
-</main><footer id="status-line">Connecting to telemetry service...</footer><script src="/static/app.js"></script></body></html>
+}</code></pre>
+  </div>
+</main>
+<footer id="status-line">Connecting to telemetry service...</footer>
+<script src="/static/app.js"></script>
+</body>
+</html>
