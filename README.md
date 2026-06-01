@@ -29,7 +29,6 @@ Recommended real hardware:
 - DS18B20 or BME280 temperature sensor
 - Proper battery holder, BMS, fuse, and load/charger module
 
-Do not connect Li-ion/LiPo batteries directly to Raspberry Pi GPIO. Use a protected charger/BMS and stay within sensor voltage/current ratings.
 
 ## Quick Start
 
