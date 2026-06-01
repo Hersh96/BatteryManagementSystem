@@ -225,10 +225,10 @@ if(page === "model"){
 
 if(page === "concepts"){
   const concepts = {
-    edge:["Edge Intelligence","All important work happens locally: measurement, storage, analytics, dashboard, and LLM report generation. This makes the project privacy-preserving and useful even without internet.",["Raspberry Pi","offline","local model","FastAPI"]],
-    telemetry:["Telemetry","Telemetry is the raw time-series stream: voltage, current, power, temperature, timestamp, and source. The collector writes this into SQLite for later analysis.",["TelemetryReading","sensors.py","storage.py","SQLite"]],
-    capacity:["Capacity Integration","Capacity is estimated by integrating current over time. Energy is estimated by integrating voltage times current over time. This is why long full-cycle tests are more reliable than short partial tests.",["analytics.py","mAh","Wh","equivalent cycles"]],
-    llm:["LLM Report","The LLM receives a SessionSummary JSON object and writes a human-readable explanation. It is intentionally downstream of the deterministic analytics layer.",["llm.py","Ollama","prompt contract","Qwen3 0.6B"]],
+    edge:["Edge Intelligence","For this project, edge intelligence means the Raspberry Pi is not just forwarding data somewhere else. It is reading the sensor, storing the session, running the calculations, serving the dashboard, and asking the local model for a report.",["Raspberry Pi","offline","local model","FastAPI"]],
+    telemetry:["Telemetry","Telemetry is the stream of readings I trust most in the project. Every later result depends on these samples: voltage, current, power, temperature, timestamp, and source.",["TelemetryReading","sensors.py","storage.py","SQLite"]],
+    capacity:["Capacity Integration","The capacity estimate comes from adding up current over time. A short test can show that the pipeline works, but a full charge or discharge cycle is needed before treating the health number as meaningful.",["analytics.py","mAh","Wh","equivalent cycles"]],
+    llm:["LLM Report","The model gets a summary that has already been calculated. Its job is to explain the result in normal language, so the final output sounds like a useful diagnostic note instead of raw numbers.",["llm.py","Ollama","structured facts","Qwen3 0.6B"]],
   };
   window.showConcept = id => {
     const [title,desc,tags] = concepts[id];
@@ -237,11 +237,11 @@ if(page === "concepts"){
     document.getElementById("concept-tags").innerHTML = tags.map((t,i)=>tag(t,["c","g","p","o"][i])).join("");
   };
   const steps = {
-    sample:["Sample","server.py runs a background collector. The collector asks the configured sensor adapter for one TelemetryReading every few seconds."],
-    store:["Store","storage.py inserts each reading into SQLite under the active session. This keeps raw measurements local and replayable."],
-    analyze:["Analyze","analytics.py summarizes all readings in the session. It computes mAh, Wh, equivalent cycles, health percentage, and rule-based issues."],
-    explain:["Explain","llm.py builds a strict prompt from the SessionSummary. Ollama/qwen3:0.6b generates the diagnosis text."],
-    display:["Display","FastAPI serves HTML pages and JSON routes. app.js fetches the API data and renders charts, cards, diagrams, and report text."],
+    sample:["Sample","server.py keeps a background collector running. Every few seconds it asks the active sensor for one reading."],
+    store:["Store","storage.py saves that reading into SQLite under the current session. This gives the project a local history instead of only a live value."],
+    analyze:["Analyze","analytics.py takes the session readings and turns them into battery metrics: capacity, energy, cycle throughput, health status, and warnings."],
+    explain:["Explain","llm.py sends the finished summary to the local model. The model writes a short diagnosis from the facts it was given."],
+    display:["Display","The HTML pages explain the project, and app.js pulls the API data into charts, cards, diagrams, and report text."],
   };
   window.selectConceptStep = (el,id) => {
     document.querySelectorAll(".byte").forEach(b=>b.classList.remove("active")); el.classList.add("active");
