@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>AI Model - Battery AI</title><link rel="stylesheet" href="/static/styles.css"></head>
+<body data-page="model">
+<nav><a class="nav-brand" href="index.html"><span class="nav-dot"></span>Battery AI</a><ul class="nav-links"><li><a href="index.html">Overview</a></li><li><a href="hardware.html">Hardware</a></li><li><a href="telemetry.html">Telemetry</a></li><li><a href="analytics.html">Analytics</a></li><li><a href="model.html" class="active">AI Model</a></li><li><a href="deployment.html">Deploy</a></li></ul></nav>
+<main>
+  <div class="page-hero"><div class="badge">Local LLM Layer</div><h1>Small Language Model</h1><p>Qwen3 0.6B runs locally through Ollama. It receives structured battery facts and converts them into a concise diagnosis, evidence, and recommendation.</p></div>
+  <div class="section"><h2 style="--accent:#b388ff">Model Pipeline</h2><div class="comp-grid">
+    <div class="comp" style="--cc:var(--green)"><div class="comp-name">Facts In</div><div class="comp-part">SessionSummary JSON</div><div class="comp-desc">The prompt includes measured capacity, energy, temperature, issues, and recommendations.</div></div>
+    <div class="comp" style="--cc:var(--purple)"><div class="comp-name">Qwen3 0.6B</div><div class="comp-part">Ollama local model</div><div class="comp-desc">Small enough for edge-class hardware, good enough for short diagnostic reports.</div></div>
+    <div class="comp" style="--cc:var(--orange)"><div class="comp-name">Report Out</div><div class="comp-part">Plain English</div><div class="comp-desc">The model explains what happened without becoming the source of truth for measurements.</div></div>
+  </div></div>
+  <div class="section"><h2 style="--accent:#69f0ae">Generate Live Report</h2><div class="model-card"><button class="btn" onclick="loadReport()">Generate Report</button><div class="result" id="ai-report" style="margin-top:1rem">Click Generate Report to ask the local model.</div><p id="report-source" style="margin-top:1rem">Model source: waiting</p></div></div>
+  <div class="section"><h2 style="--accent:#ff7043">Prompt Contract</h2><pre><code>You are an edge battery diagnostics assistant running locally on a Raspberry Pi.
+Use only the provided facts. Do not invent cycle counts, device model, or missing values.
+Write a concise report with: diagnosis, evidence, and recommendation.
+
+Battery diagnostic facts:
+{
+  "measured_capacity_mah": 353.82,
+  "equivalent_cycles": 0.0708,
+  "issues": ["Capacity health estimate is based on a partial session."]
+}</code></pre></div>
+  <div class="section"><h2 style="--accent:#ffd740">Fine-tuning</h2><div class="wire-section"><div class="wire-header"><span class="dot" style="background:var(--yellow)"></span>Optional training workflow</div><table><tr><th>Step</th><th>File</th><th>Purpose</th></tr><tr><td>Build dataset</td><td>training/build_dataset.py</td><td>Creates instruction examples</td></tr><tr><td>LoRA tune</td><td>training/finetune_lora.py</td><td>Adapts the model on a GPU</td></tr><tr><td>Quantize</td><td>training/merge_and_quantize.md</td><td>Prepares GGUF for Pi deployment</td></tr></table></div></div>
+</main><footer>Default model: qwen3:0.6b through Ollama.</footer><script src="/static/app.js"></script></body></html>

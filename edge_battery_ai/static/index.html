@@ -1,202 +1,83 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Edge AI Battery Diagnostics</title>
-    <link rel="stylesheet" href="/static/styles.css" />
-  </head>
-  <body>
-    <header class="site-header">
-      <a class="brand" href="#overview">Battery AI</a>
-      <nav aria-label="Project navigation">
-        <a href="#overview">Overview</a>
-        <a href="#live">Live Metrics</a>
-        <a href="#architecture">Architecture</a>
-        <a href="#hardware">Hardware</a>
-        <a href="#model">Model</a>
-        <a href="#setup">Setup</a>
-      </nav>
-    </header>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edge AI Battery Diagnostics - Interactive Guide</title>
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body data-page="overview">
+<nav>
+  <a class="nav-brand" href="index.html"><span class="nav-dot"></span>Battery AI</a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Overview</a></li>
+    <li><a href="hardware.html">Hardware</a></li>
+    <li><a href="telemetry.html">Telemetry</a></li>
+    <li><a href="analytics.html">Analytics</a></li>
+    <li><a href="model.html">AI Model</a></li>
+    <li><a href="deployment.html">Deploy</a></li>
+  </ul>
+</nav>
 
-    <main>
-      <section id="overview" class="hero section-shell">
-        <p class="eyebrow">Real-time Edge Intelligence</p>
-        <h1>Edge AI Battery Diagnostics</h1>
-        <p class="hero-copy">
-          Raspberry Pi telemetry, battery-health analytics, and a local small language model that explains
-          battery behavior without cloud inference.
-        </p>
-        <div class="hero-actions">
-          <a class="button primary" href="#live">Open Live Dashboard</a>
-          <a class="button secondary" href="#architecture">Explore System</a>
-        </div>
-        <div class="stat-grid" aria-label="Project highlights">
-          <article><strong id="stat-health">--</strong><span>Health Estimate</span></article>
-          <article><strong>Qwen3 0.6B</strong><span>Local LLM</span></article>
-          <article><strong>SQLite</strong><span>Telemetry Store</span></article>
-          <article><strong>INA219</strong><span>Sensor Ready</span></article>
-          <article><strong id="stat-samples">--</strong><span>Samples</span></article>
-          <article><strong>Offline</strong><span>Cloud Optional</span></article>
-        </div>
-      </section>
+<div class="hero">
+  <div class="hero-head">
+    <div class="badge"><span class="badge-dot"></span>Offline Edge Intelligence</div>
+    <h1>Edge AI Battery Diagnostics</h1>
+    <p class="hero-sub">Raspberry Pi + INA219 telemetry + SQLite + deterministic battery analytics + local Qwen3 0.6B reports. Click any block in the diagram below to learn how the system works from scratch.</p>
+  </div>
 
-      <section id="live" class="section-shell">
-        <div class="section-heading">
-          <p class="eyebrow">Live Battery Session</p>
-          <h2>Metrics and Local Diagnosis</h2>
-          <p id="status-line">Connecting to the Raspberry Pi service...</p>
-        </div>
+  <div class="arch-wrap">
+    <div class="arch-box"><canvas id="arch"></canvas></div>
+    <div class="detail" id="detail">
+      <div class="detail-head">
+        <h3 id="d-title"></h3>
+        <button class="detail-close" onclick="closeDetail()">x</button>
+      </div>
+      <p id="d-desc"></p>
+      <div class="tags" id="d-tags"></div>
+    </div>
+  </div>
 
-        <div class="metrics-grid">
-          <article class="metric-card">
-            <span>Voltage</span>
-            <strong id="voltage">--</strong>
-            <small>Bus voltage from sensor</small>
-          </article>
-          <article class="metric-card">
-            <span>Current</span>
-            <strong id="current">--</strong>
-            <small>Charge or discharge current</small>
-          </article>
-          <article class="metric-card">
-            <span>Power</span>
-            <strong id="power">--</strong>
-            <small>Instantaneous watts</small>
-          </article>
-          <article class="metric-card">
-            <span>Temperature</span>
-            <strong id="temperature">--</strong>
-            <small>Battery or ambient probe</small>
-          </article>
-          <article class="metric-card">
-            <span>Measured Capacity</span>
-            <strong id="capacity">--</strong>
-            <small>Integrated over session</small>
-          </article>
-          <article class="metric-card">
-            <span>Equivalent Cycles</span>
-            <strong id="cycles">--</strong>
-            <small>Throughput divided by rated capacity</small>
-          </article>
-        </div>
+  <div class="stats">
+    <div><div class="stat-val">Pi 5</div><div class="stat-lbl">Edge Device</div></div>
+    <div><div class="stat-val">INA219</div><div class="stat-lbl">Current Sensor</div></div>
+    <div><div class="stat-val">SQLite</div><div class="stat-lbl">Local Log</div></div>
+    <div><div class="stat-val">mAh</div><div class="stat-lbl">Capacity Estimate</div></div>
+    <div><div class="stat-val">Qwen3</div><div class="stat-lbl">0.6B Local LLM</div></div>
+    <div><div class="stat-val">Offline</div><div class="stat-lbl">No Cloud Required</div></div>
+  </div>
 
-        <div class="live-layout">
-          <article class="panel chart-panel">
-            <div class="panel-heading">
-              <div>
-                <h3>Telemetry Stream</h3>
-                <p>Voltage, current, and temperature are normalized for live comparison.</p>
-              </div>
-              <button id="reset-session" type="button">Reset Session</button>
-            </div>
-            <canvas id="telemetry-chart" width="960" height="420" aria-label="Live telemetry chart"></canvas>
-          </article>
+  <p class="sec-hdr">Explore each layer of the system</p>
+  <div class="pages">
+    <a class="page-card" href="hardware.html" style="--cc:#69f0ae">
+      <div class="page-icon">HW</div><h3>Hardware & Wiring</h3>
+      <p>Raspberry Pi, INA219/INA226, temperature sensor, protected battery path, and safe wiring assumptions.</p>
+      <div class="page-arrow">Explore <span>-></span></div>
+    </a>
+    <a class="page-card" href="telemetry.html" style="--cc:#00d4ff">
+      <div class="page-icon">IO</div><h3>Telemetry Pipeline</h3>
+      <p>Live voltage, current, power, temperature, session logging, and the local FastAPI telemetry routes.</p>
+      <div class="page-arrow">Explore <span>-></span></div>
+    </a>
+    <a class="page-card" href="analytics.html" style="--cc:#ff7043">
+      <div class="page-icon">FX</div><h3>Battery Analytics</h3>
+      <p>Capacity integration, Wh calculation, equivalent cycles, partial-session detection, and diagnostic rules.</p>
+      <div class="page-arrow">Explore <span>-></span></div>
+    </a>
+    <a class="page-card" href="model.html" style="--cc:#b388ff">
+      <div class="page-icon">AI</div><h3>Small Language Model</h3>
+      <p>Qwen3 0.6B through Ollama receives structured facts and writes a human-readable diagnosis locally.</p>
+      <div class="page-arrow">Explore <span>-></span></div>
+    </a>
+    <a class="page-card" href="deployment.html" style="--cc:#ffd740">
+      <div class="page-icon">RUN</div><h3>Deployment</h3>
+      <p>Windows demo, Raspberry Pi setup scripts, environment variables, GitHub workflow, and fine-tuning path.</p>
+      <div class="page-arrow">Explore <span>-></span></div>
+    </a>
+  </div>
+</div>
 
-          <article class="panel report-panel">
-            <div class="panel-heading">
-              <div>
-                <h3>On-device AI Report</h3>
-                <p id="report-source">Waiting for model...</p>
-              </div>
-              <button id="refresh-report" type="button">Generate</button>
-            </div>
-            <p id="ai-report" class="report-box">Collecting telemetry before report generation.</p>
-            <div class="two-list">
-              <div>
-                <h4>Detected Issues</h4>
-                <ul id="issues"></ul>
-              </div>
-              <div>
-                <h4>Recommendations</h4>
-                <ul id="recommendations"></ul>
-              </div>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section id="architecture" class="section-shell">
-        <div class="section-heading">
-          <p class="eyebrow">Interactive System Map</p>
-          <h2>Click a block to inspect the project</h2>
-        </div>
-        <div class="architecture-grid">
-          <div class="system-map" aria-label="Architecture blocks">
-            <button class="system-block active" data-topic="sensing">1. Sensor Layer</button>
-            <button class="system-block" data-topic="storage">2. Telemetry Store</button>
-            <button class="system-block" data-topic="analytics">3. Health Analytics</button>
-            <button class="system-block" data-topic="llm">4. Local LLM</button>
-            <button class="system-block" data-topic="dashboard">5. Dashboard</button>
-            <button class="system-block" data-topic="deployment">6. Pi Deployment</button>
-          </div>
-          <article class="panel detail-panel">
-            <p class="eyebrow" id="detail-kicker">Sensor Layer</p>
-            <h3 id="detail-title">INA219 or simulated telemetry</h3>
-            <p id="detail-body"></p>
-            <dl id="detail-list"></dl>
-          </article>
-        </div>
-      </section>
-
-      <section id="hardware" class="section-shell info-grid">
-        <article class="info-card">
-          <h2>Hardware</h2>
-          <p>
-            The project runs without hardware in simulator mode. For the edge build, use a Raspberry Pi 5,
-            an INA219/INA226 current sensor, a temperature probe, and a protected battery test circuit.
-          </p>
-          <ul>
-            <li>Raspberry Pi 4/5 with 4GB or 8GB RAM</li>
-            <li>INA219, INA226, or USB meter with serial output</li>
-            <li>DS18B20/BME280 temperature sensor</li>
-            <li>Battery holder, charger/load module, fuse, and BMS</li>
-          </ul>
-        </article>
-        <article id="model" class="info-card">
-          <h2>AI Model</h2>
-          <p>
-            The downloaded model is Qwen3 0.6B through Ollama. The model receives structured facts from
-            the analytics engine and writes a concise diagnosis. It does not invent raw measurements.
-          </p>
-          <code>BATTERY_AI_LLM_PROVIDER=ollama</code>
-          <code>BATTERY_AI_MODEL=qwen3:0.6b</code>
-        </article>
-      </section>
-
-      <section id="setup" class="section-shell setup-section">
-        <div class="section-heading">
-          <p class="eyebrow">Runbook</p>
-          <h2>From laptop demo to Raspberry Pi</h2>
-        </div>
-        <div class="step-grid">
-          <article>
-            <span>01</span>
-            <h3>Install dependencies</h3>
-            <code>python -m pip install -r requirements.txt</code>
-          </article>
-          <article>
-            <span>02</span>
-            <h3>Download model</h3>
-            <code>ollama pull qwen3:0.6b</code>
-          </article>
-          <article>
-            <span>03</span>
-            <h3>Run app</h3>
-            <code>python -m edge_battery_ai.server</code>
-          </article>
-          <article>
-            <span>04</span>
-            <h3>Use hardware mode</h3>
-            <code>BATTERY_AI_SENSOR=ina219</code>
-          </article>
-        </div>
-      </section>
-    </main>
-
-    <footer>
-      Raspberry Pi · FastAPI · SQLite · Ollama · Qwen3 0.6B · Edge Battery Diagnostics
-    </footer>
-    <script src="/static/app.js"></script>
-  </body>
+<footer>Raspberry Pi + INA219 + FastAPI + SQLite + Ollama + Qwen3 0.6B</footer>
+<script src="/static/app.js"></script>
+</body>
 </html>

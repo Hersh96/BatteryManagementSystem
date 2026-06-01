@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Deployment - Battery AI</title><link rel="stylesheet" href="/static/styles.css"></head>
+<body data-page="deployment">
+<nav><a class="nav-brand" href="index.html"><span class="nav-dot"></span>Battery AI</a><ul class="nav-links"><li><a href="index.html">Overview</a></li><li><a href="hardware.html">Hardware</a></li><li><a href="telemetry.html">Telemetry</a></li><li><a href="analytics.html">Analytics</a></li><li><a href="model.html">AI Model</a></li><li><a href="deployment.html" class="active">Deploy</a></li></ul></nav>
+<main>
+  <div class="page-hero"><div class="badge">Runbook Layer</div><h1>Deployment & Setup</h1><p>Everything needed to run the project locally, move it to Raspberry Pi, use real sensors, and publish the project on GitHub.</p></div>
+  <div class="section"><h2 style="--accent:#ffd740">Setup Steps</h2><div class="step-grid">
+    <div class="step" style="--cc:var(--green)"><div class="comp-name">01 Windows Demo</div><p>Run scripts/setup_windows.ps1, then scripts/run_windows.ps1. This installs Python dependencies and pulls qwen3:0.6b.</p></div>
+    <div class="step" style="--cc:var(--cyan)"><div class="comp-name">02 Raspberry Pi</div><p>Run bash scripts/setup_pi.sh, then bash scripts/run_pi.sh. The default mode still uses simulated telemetry.</p></div>
+    <div class="step" style="--cc:var(--orange)"><div class="comp-name">03 Hardware Mode</div><p>Set BATTERY_AI_SENSOR=ina219 and install adafruit-circuitpython-ina219 after wiring the sensor safely.</p></div>
+    <div class="step" style="--cc:var(--purple)"><div class="comp-name">04 GitHub</div><p>Source, docs, tests, and GitHub Actions are ready. Generated logs, databases, caches, and model files are ignored.</p></div>
+  </div></div>
+  <div class="section"><h2 style="--accent:#69f0ae">Commands</h2><pre><code><span class="cm"># Windows</span>
+scripts\setup_windows.ps1
+scripts\run_windows.ps1
+
+<span class="cm"># Raspberry Pi / Linux</span>
+bash scripts/setup_pi.sh
+bash scripts/run_pi.sh
+
+<span class="cm"># Real sensor mode</span>
+BATTERY_AI_SENSOR=ina219 BATTERY_AI_LLM_PROVIDER=ollama python -m edge_battery_ai.server</code></pre></div>
+  <div class="section"><h2 style="--accent:#b388ff">Environment Variables</h2><div class="wire-section"><div class="wire-header"><span class="dot" style="background:var(--purple)"></span>.env.example</div><table><tr><th>Variable</th><th>Default</th><th>Meaning</th></tr><tr><td>BATTERY_AI_SENSOR</td><td>simulated</td><td>simulated or ina219</td></tr><tr><td>BATTERY_AI_MODEL</td><td>qwen3:0.6b</td><td>Ollama model name</td></tr><tr><td>BATTERY_AI_RATED_CAPACITY_MAH</td><td>5000</td><td>Reference capacity for health estimate</td></tr><tr><td>BATTERY_AI_SAMPLE_INTERVAL_S</td><td>2</td><td>Collector sample interval</td></tr></table></div></div>
+  <div class="section"><h2 style="--accent:#ff7043">Repository Contents</h2><div class="ft-grid"><div class="ft"><h4>edge_battery_ai/</h4><p>FastAPI app, sensor adapters, storage, analytics, and LLM report generator.</p></div><div class="ft"><h4>training/</h4><p>Dataset builder, LoRA fine-tuning script, and GGUF quantization notes.</p></div><div class="ft"><h4>docs/</h4><p>Functionality guide for the project description and resume explanation.</p></div><div class="ft"><h4>.github/</h4><p>GitHub Actions workflow that runs the Python test suite.</p></div></div></div>
+</main><footer>Open http://127.0.0.1:8000 after starting the server.</footer><script src="/static/app.js"></script></body></html>

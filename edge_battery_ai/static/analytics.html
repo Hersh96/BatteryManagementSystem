@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Battery Analytics - Battery AI</title><link rel="stylesheet" href="/static/styles.css"></head>
+<body data-page="analytics">
+<nav><a class="nav-brand" href="index.html"><span class="nav-dot"></span>Battery AI</a><ul class="nav-links"><li><a href="index.html">Overview</a></li><li><a href="hardware.html">Hardware</a></li><li><a href="telemetry.html">Telemetry</a></li><li><a href="analytics.html" class="active">Analytics</a></li><li><a href="model.html">AI Model</a></li><li><a href="deployment.html">Deploy</a></li></ul></nav>
+<main>
+  <div class="page-hero"><div class="badge">Analytics Layer</div><h1>Battery Health Math</h1><p>The LLM does not guess health. First, deterministic formulas compute capacity, energy, equivalent cycles, and warnings. The model only explains these facts.</p></div>
+  <div class="section"><h2 style="--accent:#ff7043">Interactive Formula Decoder</h2><div class="frame-vis"><div class="frame-row">
+    <div class="byte" style="--bc:#69f0ae;--bs:rgba(105,240,174,.3)" onclick="selectFormula(this,'current')"><div class="byte-hex">I</div><div class="byte-label">CURRENT</div></div>
+    <div class="byte" style="--bc:#00d4ff;--bs:rgba(0,212,255,.3)" onclick="selectFormula(this,'time')"><div class="byte-hex">dt</div><div class="byte-label">TIME STEP</div></div>
+    <div class="byte payload" style="--bc:#ff7043;--bs:rgba(255,112,67,.3)" onclick="selectFormula(this,'capacity')"><div class="byte-hex">mAh = sum(abs(I) * 1000 * dt_hours)</div><div class="byte-label">CAPACITY</div></div>
+    <div class="byte" style="--bc:#ffd740;--bs:rgba(255,215,64,.3)" onclick="selectFormula(this,'health')"><div class="byte-hex">%</div><div class="byte-label">HEALTH</div></div>
+  </div><div class="byte-detail" id="formula-detail"><h4>Click a formula field above</h4><p>Each piece maps directly to code in edge_battery_ai/analytics.py.</p></div></div></div>
+  <div class="section"><h2 style="--accent:#69f0ae">Current Session Summary</h2><div class="metric-grid">
+    <div class="metric" style="--cc:var(--cyan)"><div class="metric-lbl">Measured Capacity</div><div class="metric-val" id="capacity">--</div><div class="metric-sub">Integrated current over time.</div></div>
+    <div class="metric" style="--cc:var(--yellow)"><div class="metric-lbl">Energy</div><div class="metric-val" id="energy">--</div><div class="metric-sub">Integrated voltage-current-time.</div></div>
+    <div class="metric" style="--cc:var(--purple)"><div class="metric-lbl">Equivalent Cycles</div><div class="metric-val" id="cycles">--</div><div class="metric-sub">Session throughput / rated capacity.</div></div>
+    <div class="metric" style="--cc:var(--orange)"><div class="metric-lbl">Health Status</div><div class="metric-val" id="health">--</div><div class="metric-sub">Unknown until enough cycle data exists.</div></div>
+  </div></div>
+  <div class="section"><h2 style="--accent:#b388ff">Diagnostic Rules</h2><div class="wire-section"><div class="wire-header"><span class="dot" style="background:var(--purple)"></span>Rule engine before LLM report</div><table><tr><th>Condition</th><th>Issue</th><th>Recommendation</th></tr><tr><td>health &lt; 60%</td><td>Severe capacity loss</td><td>Replace if reliability matters</td></tr><tr><td>health &lt; 80%</td><td>Capacity degradation</td><td>Avoid heat and fast charging</td></tr><tr><td>temp >= 50 C</td><td>Unsafe temperature</td><td>Stop test immediately</td></tr><tr><td>short session</td><td>Partial estimate</td><td>Run full charge/discharge cycle</td></tr></table></div></div>
+</main><footer id="status-line">Loading analytics summary...</footer><script src="/static/app.js"></script></body></html>

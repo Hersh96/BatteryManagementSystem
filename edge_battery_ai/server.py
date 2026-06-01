@@ -51,6 +51,14 @@ def dashboard() -> FileResponse:
     return FileResponse(static_dir / "index.html")
 
 
+@app.get("/{page_name}.html")
+def static_page(page_name: str) -> FileResponse:
+    allowed_pages = {"index", "hardware", "telemetry", "analytics", "model", "deployment"}
+    if page_name not in allowed_pages:
+        page_name = "index"
+    return FileResponse(static_dir / f"{page_name}.html")
+
+
 @app.get("/api/status")
 def status() -> dict[str, object]:
     session_id = store.active_session_id()

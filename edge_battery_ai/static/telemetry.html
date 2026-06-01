@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Telemetry Pipeline - Battery AI</title><link rel="stylesheet" href="/static/styles.css"></head>
+<body data-page="telemetry">
+<nav><a class="nav-brand" href="index.html"><span class="nav-dot"></span>Battery AI</a><ul class="nav-links"><li><a href="index.html">Overview</a></li><li><a href="hardware.html">Hardware</a></li><li><a href="telemetry.html" class="active">Telemetry</a></li><li><a href="analytics.html">Analytics</a></li><li><a href="model.html">AI Model</a></li><li><a href="deployment.html">Deploy</a></li></ul></nav>
+<main>
+  <div class="page-hero"><div class="badge">Telemetry Layer</div><h1>Live Telemetry Pipeline</h1><p>The collector samples battery signals, writes them to SQLite, and exposes live readings through FastAPI. This page connects to the running service and plots the current session.</p></div>
+  <div class="section"><h2 style="--accent:#00d4ff">Live Metrics</h2><div class="metric-grid">
+    <div class="metric" style="--cc:var(--cyan)"><div class="metric-lbl">Voltage</div><div class="metric-val" id="voltage">--</div><div class="metric-sub">Bus voltage from the sensor.</div></div>
+    <div class="metric" style="--cc:var(--green)"><div class="metric-lbl">Current</div><div class="metric-val" id="current">--</div><div class="metric-sub">Charge or discharge current.</div></div>
+    <div class="metric" style="--cc:var(--yellow)"><div class="metric-lbl">Power</div><div class="metric-val" id="power">--</div><div class="metric-sub">Voltage multiplied by current.</div></div>
+    <div class="metric" style="--cc:var(--purple)"><div class="metric-lbl">Temperature</div><div class="metric-val" id="temperature">--</div><div class="metric-sub">Thermal safety context.</div></div>
+  </div><div class="chart-card"><canvas id="telemetry-chart"></canvas></div></div>
+  <div class="section"><h2 style="--accent:#69f0ae">API Endpoints</h2><div class="wire-section"><div class="wire-header"><span class="dot" style="background:var(--cyan)"></span>FastAPI telemetry routes</div><table><tr><th>Route</th><th>Purpose</th><th>Used By</th></tr><tr><td>/api/status</td><td>Session, sensor, model config</td><td>Navbar/status cards</td></tr><tr><td>/api/readings</td><td>Recent voltage/current/temp samples</td><td>Live chart</td></tr><tr><td>/api/summary</td><td>Integrated battery analytics</td><td>Analytics page</td></tr><tr><td>/api/report</td><td>Local LLM diagnosis</td><td>Model page</td></tr></table></div></div>
+  <div class="section"><h2 style="--accent:#ff7043">Stored Reading Format</h2><pre><code>{
+  "timestamp": "2026-06-01T06:39:50Z",
+  "voltage_v": 4.183,
+  "current_a": 0.843,
+  "power_w": 3.525,
+  "temperature_c": 37.4,
+  "source": "simulated"
+}</code></pre></div>
+</main><footer id="status-line">Connecting to telemetry service...</footer><script src="/static/app.js"></script></body></html>
