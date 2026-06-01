@@ -53,7 +53,7 @@ def dashboard() -> FileResponse:
 
 @app.get("/{page_name}.html")
 def static_page(page_name: str) -> FileResponse:
-    allowed_pages = {"index", "hardware", "telemetry", "analytics", "model", "deployment"}
+    allowed_pages = {"index", "hardware", "telemetry", "analytics", "model", "concepts"}
     if page_name not in allowed_pages:
         page_name = "index"
     return FileResponse(static_dir / f"{page_name}.html")

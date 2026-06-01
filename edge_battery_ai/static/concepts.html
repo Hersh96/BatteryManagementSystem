@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Concepts & Code - Battery AI</title><link rel="stylesheet" href="/static/styles.css"></head>
+<body data-page="concepts">
+<nav><a class="nav-brand" href="index.html"><span class="nav-dot"></span>Battery AI</a><ul class="nav-links"><li><a href="index.html">Overview</a></li><li><a href="hardware.html">Hardware</a></li><li><a href="telemetry.html">Telemetry</a></li><li><a href="analytics.html">Analytics</a></li><li><a href="model.html">AI Model</a></li><li><a href="concepts.html" class="active">Concepts</a></li></ul></nav>
+<main>
+  <div class="page-hero"><div class="badge">Full Project Walkthrough</div><h1>Concepts & Code Map</h1><p>This page explains the entire project from scratch: why it exists, what every layer does, and which code files implement each behavior.</p></div>
+
+  <div class="section"><h2 style="--accent:#69f0ae">Purpose of the Project</h2><div class="model-card"><p>The goal is to build a low-cost edge AI battery diagnostics system. A Raspberry Pi measures battery behavior locally, estimates health from real telemetry, and uses a small local language model to explain the result. The important engineering idea is separation of responsibility: sensors measure, deterministic code calculates, and the LLM explains.</p></div></div>
+
+  <div class="section"><h2 style="--accent:#00d4ff">Core Concepts</h2><div class="comp-grid">
+    <div class="comp" style="--cc:var(--green)" onclick="showConcept('edge')"><div class="comp-name">Edge Intelligence</div><div class="comp-part">Local sensing + local reasoning</div><div class="comp-desc">The Pi runs the app and model without cloud inference.</div></div>
+    <div class="comp" style="--cc:var(--cyan)" onclick="showConcept('telemetry')"><div class="comp-name">Telemetry</div><div class="comp-part">Voltage, current, power, temperature</div><div class="comp-desc">Samples are collected continuously and stored as session data.</div></div>
+    <div class="comp" style="--cc:var(--orange)" onclick="showConcept('capacity')"><div class="comp-name">Capacity Integration</div><div class="comp-part">mAh and Wh over time</div><div class="comp-desc">Battery capacity is computed from current and timestamps.</div></div>
+    <div class="comp" style="--cc:var(--purple)" onclick="showConcept('llm')"><div class="comp-name">LLM Report</div><div class="comp-part">Explanation, not measurement</div><div class="comp-desc">The model turns structured facts into readable diagnosis text.</div></div>
+  </div><div class="detail on" id="concept-detail"><div class="detail-head"><h3 id="concept-title">Click a concept</h3></div><p id="concept-desc">Select a card above to see the detailed explanation and files involved.</p><div class="tags" id="concept-tags"></div></div></div>
+
+  <div class="section"><h2 style="--accent:#ffd740">Code Walkthrough</h2><div class="wire-section"><div class="wire-header"><span class="dot" style="background:var(--yellow)"></span>What each file does</div><table><tr><th>File</th><th>Responsibility</th><th>Key Functions / Classes</th></tr>
+    <tr><td>edge_battery_ai/server.py</td><td>FastAPI app, routes, static pages, background collector loop</td><td>lifespan, _collect_loop, /api/status, /api/summary, /api/report</td></tr>
+    <tr><td>edge_battery_ai/sensors.py</td><td>Sensor abstraction, simulator, INA219 adapter</td><td>Sensor, SimulatedBatterySensor, Ina219Sensor, build_sensor</td></tr>
+    <tr><td>edge_battery_ai/storage.py</td><td>SQLite sessions and telemetry samples</td><td>TelemetryStore, create_session, insert_reading, latest_readings</td></tr>
+    <tr><td>edge_battery_ai/analytics.py</td><td>Battery math and deterministic diagnostic rules</td><td>summarize_session, diagnose, _integrate_capacity</td></tr>
+    <tr><td>edge_battery_ai/llm.py</td><td>Ollama/llama.cpp report generation and offline fallback</td><td>BatteryReportGenerator, build_prompt</td></tr>
+    <tr><td>edge_battery_ai/models.py</td><td>Typed API/data models</td><td>TelemetryReading, SessionSummary, AiReport</td></tr>
+    <tr><td>edge_battery_ai/static/*.html</td><td>Interactive documentation and live dashboard pages</td><td>Overview, Hardware, Telemetry, Analytics, Model, Concepts</td></tr>
+    <tr><td>edge_battery_ai/static/app.js</td><td>Canvas diagram, live charts, concept cards, model report action</td><td>draw, loadTelemetry, drawTelemetry, showConcept</td></tr>
+    <tr><td>training/*.py</td><td>Optional LoRA fine-tuning workflow</td><td>build_dataset.py, finetune_lora.py</td></tr>
+  </table></div></div>
+
+  <div class="section"><h2 style="--accent:#b388ff">Execution Flow</h2><div class="frame-vis"><div class="frame-row">
+    <div class="byte" style="--bc:#69f0ae;--bs:rgba(105,240,174,.3)" onclick="selectConceptStep(this,'sample')"><div class="byte-hex">01</div><div class="byte-label">SAMPLE</div></div>
+    <div class="byte" style="--bc:#00d4ff;--bs:rgba(0,212,255,.3)" onclick="selectConceptStep(this,'store')"><div class="byte-hex">02</div><div class="byte-label">STORE</div></div>
+    <div class="byte" style="--bc:#ff7043;--bs:rgba(255,112,67,.3)" onclick="selectConceptStep(this,'analyze')"><div class="byte-hex">03</div><div class="byte-label">ANALYZE</div></div>
+    <div class="byte" style="--bc:#b388ff;--bs:rgba(179,136,255,.3)" onclick="selectConceptStep(this,'explain')"><div class="byte-hex">04</div><div class="byte-label">EXPLAIN</div></div>
+    <div class="byte" style="--bc:#ffd740;--bs:rgba(255,215,64,.3)" onclick="selectConceptStep(this,'display')"><div class="byte-hex">05</div><div class="byte-label">DISPLAY</div></div>
+  </div><div class="byte-detail" id="concept-step"><h4>Click a step</h4><p>The system works as a pipeline: sample, store, analyze, explain, display.</p></div></div></div>
+
+  <div class="section"><h2 style="--accent:#ff7043">Why the LLM is Not the Calculator</h2><pre><code><span class="cm"># Good architecture</span>
+sensor readings -> analytics.py -> structured facts -> llm.py -> readable report
+
+<span class="cm"># Avoid this</span>
+sensor readings -> LLM guesses battery health
+
+<span class="cm"># Reason</span>
+Battery health should come from measured capacity, energy, temperature, and rules.
+The language model is used for communication, not as the source of truth.</code></pre></div>
+</main><footer>Concepts page: understand the project before modifying the code.</footer><script src="/static/app.js"></script></body></html>
