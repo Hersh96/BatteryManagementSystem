@@ -1,0 +1,15 @@
+[project]
+name = "edge-battery-ai"
+version = "0.1.0"
+description = "Raspberry Pi edge AI battery diagnostics with local LLM reporting."
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi==0.115.6",
+  "uvicorn[standard]==0.32.1",
+  "pydantic==2.10.3",
+  "requests==2.32.3",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
